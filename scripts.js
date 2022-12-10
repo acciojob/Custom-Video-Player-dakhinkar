@@ -1,67 +1,58 @@
-// Edit this file
 const player = document.querySelector('.player');
 const video = player.querySelector('.viewer');
 const progress = player.querySelector('.progress');
-const progessBar = player.querySelector('.progress__filled');
+const progressBar = player.querySelector('.progress__filled');
 const toggle = player.querySelector('.toggle');
 const skipButtons = player.querySelectorAll('[data-skip]');
 const ranges = player.querySelectorAll('.player__slider');
+const fullscreen = player.querySelector('.fullscreen');
 
 
-const toggleClickHandler = () => {
-    console.log(toggle.title);
-    const toggleType = toggle.title;
-//     toggle.title.includes("Play")
-// true
-// toggle.attributes['title'].textContent = "Toggle pause"; 
-// 'Toggle pause'
-    // console.log(typeof toggleType)
-    if (toggleType.includes("Play") ){
-        video.play();
-        toggle.attributes['title'].textContent = "Toggle Pause";
-        toggle.innerHTML ='❚ ❚';
-        
-    } else {
-        video.pause();
-        toggle.attributes['title'].textContent = "Toggle Play";
-        toggle.innerHTML = '►';
-    }
+
+
+const togglePlay = () => {
+    const method = video.paused ? 'play' : 'pause';
+    video[method]();
 }
 
-const volumeChange = () => {
-    video.volume = ranges[0].value;
-}
-
-const playBackRateChange = (e) => {
-    video.playbackRate = ranges[1].value;
-    e.title = ranges[1].value;
-}
-const forwardBackChange = (e) => {
-    const time = Number(e.attributes['data-skip'].value);
-    // console.log(time);
-
-    const currT = Number(video.currentTime);
-    // console.log("curr Time", currT);
-    
-    video.currentTime = currT + time;
-}
-
-const progressbarHandler = () => {
-    const currTime = Number(video.currentTime);
-    console.log(currTime);
+const updateButton = () => {
+    toggle.textContent = video.paused ? '►' : '❚ ❚';
   
-    const totalDuration = Number(video.duration);
-    console.log("totalDur: ", totalDuration);
-    const fillPerc = Math.round((currTime / totalDuration) * 100);
-    console.log(fillPerc);
-    progessBar.style.flexBasis = `${fillPerc}%`;
-    // progessBar.innerHTML.value = fillPerc;
- if (currTime == totalDuration) {
-         video.pause();
-        toggle.attributes['title'].textContent = "Toggle Play";
-        toggle.innerHTML = '►';
-    }
-
-
 }
 
+const handlerProgress = () => {
+    const percent = (video.currentTime / video.duration) * 100;
+    progressBar.style.flexBasis = `${percent}%`;
+}
+
+const skip = function(){
+    console.log("skip");
+    video.currentTime += parseFloat(this.dataset.skip);
+}
+
+const handleRangeUpdate = function () {
+    video[this.name] = this.value;
+}
+
+const scrub = function (e) {
+    const scrubTime = (e.offsetX / progress.offsetWidth) * video.duration;
+    video.currentTime = scrubTime;
+}
+
+video.addEventListener('click', togglePlay);
+video.addEventListener('play', updateButton);
+video.addEventListener('pause', updateButton);
+video.addEventListener('timeupdate', handlerProgress);
+
+toggle.addEventListener('click', togglePlay);
+
+skipButtons.forEach(skipButton => skipButton.addEventListener('click', skip));
+
+ranges.forEach(range => range.addEventListener('change', handleRangeUpdate));
+ranges.forEach(range => range.addEventListener('mousemove', handleRangeUpdate));
+
+let mousedown = false;
+progress.addEventListener('click', scrub);
+progress.addEventListener('mousedown', () => mousedown = true);
+progress.addEventListener('mousemove', (e) => mousedown && scrub(e));
+progress.addEventListener('mouseup', () => mousedown = false);
