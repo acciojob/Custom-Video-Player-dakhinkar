@@ -19,7 +19,7 @@ const toggleClickHandler = () => {
     if (toggleType.includes("Play") ){
         video.play();
         toggle.attributes['title'].textContent = "Toggle Pause";
-        toggle.innerHTML = '❚❚';
+        toggle.innerHTML = '❚ ❚';
         
     } else {
         video.pause();
