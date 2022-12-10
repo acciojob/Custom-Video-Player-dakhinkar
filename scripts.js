@@ -56,7 +56,11 @@ const progressbarHandler = () => {
     console.log(fillPerc);
     progessBar.style.flexBasis = `${fillPerc}%`;
     // progessBar.innerHTML.value = fillPerc;
-
+ if (currTime == totalDuration) {
+         video.pause();
+        toggle.attributes['title'].textContent = "Toggle Play";
+        toggle.innerHTML = '►';
+    }
 
 
 }
